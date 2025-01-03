@@ -12,10 +12,11 @@ const contactsSchema = new Schema(
     },
     email: {
       type: String,
-      optional: true,
+      required: false,
     },
     isFavourite: {
       type: Boolean,
+      required: false,
       default: false,
     },
     contactType: {
@@ -24,11 +25,11 @@ const contactsSchema = new Schema(
       enum: ['work', 'home', 'personal'],
       default: 'personal',
     },
+    userId: { type: Schema.Types.ObjectId, ref: 'users' },
   },
   {
     timestamps: true,
     versionKey: false,
   },
 );
-
 export const ContactsCollection = model('contacts', contactsSchema);
