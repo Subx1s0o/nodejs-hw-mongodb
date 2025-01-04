@@ -51,7 +51,7 @@ export const getContactByIdController = async (req, res, next) => {
     });
 };
 
-// Створення нового контакту
+
 export const createContactController = async (req, res, next) => {
 
     const contactSchema = {
