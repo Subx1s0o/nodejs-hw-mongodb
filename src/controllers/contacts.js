@@ -12,7 +12,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 // Отримання всіх контактів
 export const getContactsController = async (req, res, next) => {
-  try {
+
     const { page, perPage } = parsePaginationParams(req.query);
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const filter = parseFilterParams(req.query);
@@ -31,18 +31,12 @@ export const getContactsController = async (req, res, next) => {
       message: 'Successfully found contacts!',
       data: contacts,
     });
-  } catch (err) {
-    next(err);
-  }
+
 };
 
 // Отримання контакту за ID
 export const getContactByIdController = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    if (!id) {
-      return next(createHttpError(400, 'Invalid contact ID'));
-    }
+  const { id } = req.params;
 
     const contact = await getContactById(id, req.user._id);
 
@@ -55,14 +49,11 @@ export const getContactByIdController = async (req, res, next) => {
       message: `Successfully found contact with id ${id}!`,
       data: contact,
     });
-  } catch (err) {
-    next(err);
-  }
 };
 
 // Створення нового контакту
 export const createContactController = async (req, res, next) => {
-  try {
+
     const contactSchema = {
       name: req.body.name,
       phoneNumber: req.body.phoneNumber,
@@ -75,10 +66,11 @@ export const createContactController = async (req, res, next) => {
     if (
       !contactSchema.name ||
       !contactSchema.phoneNumber ||
-      !contactSchema.email
+      !contactSchema.contactType
     ) {
       return next(createHttpError(400, 'Missing required fields'));
     }
+    
 
     const contact = await createContact(contactSchema, req.user._id);
 
@@ -87,18 +79,13 @@ export const createContactController = async (req, res, next) => {
       message: 'Successfully created a contact!',
       data: contact,
     });
-  } catch (err) {
-    next(err);
-  }
+
 };
 
 // Оновлення контакту
 export const patchContactController = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    if (!id) {
-      return next(createHttpError(400, 'Invalid contact ID'));
-    }
+
+  const { id } = req.params;
 
     const result = await updateContact(id, req.body, req.user._id);
 
@@ -111,18 +98,14 @@ export const patchContactController = async (req, res, next) => {
       message: `Successfully patched a contact!`,
       data: result.contact,
     });
-  } catch (err) {
-    next(err);
-  }
+
 };
 
 // Видалення контакту
 export const deleteContactController = async (req, res, next) => {
-  try {
+
     const { id } = req.params;
-    if (!id) {
-      return next(createHttpError(400, 'Invalid contact ID'));
-    }
+
 
     const contact = await deleteContact(id, req.user._id);
 
@@ -131,7 +114,5 @@ export const deleteContactController = async (req, res, next) => {
     }
 
     res.status(204).send();
-  } catch (err) {
-    next(err);
-  }
+
 };
