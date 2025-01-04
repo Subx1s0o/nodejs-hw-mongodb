@@ -83,6 +83,7 @@ export const updateContact = async (id, payload, userId) => {
     const rawResult = await ContactsCollection.findOneAndUpdate(
       { _id: id, userId },
       payload,
+
     ).lean();
 
     if (!rawResult) return null;
