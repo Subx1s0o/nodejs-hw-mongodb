@@ -10,88 +10,67 @@ export const getAllContacts = async ({
   sortBy = 'name',
   filter = {},
 }) => {
-  try {
-    const limit = perPage;
-    const skip = (page - 1) * perPage;
-    const sortOptions = { [sortBy]: sortOrder };
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+  const sortOptions = { [sortBy]: sortOrder };
 
-    const contactsQuery = ContactsCollection.find({ userId });
+  const contactsQuery = ContactsCollection.find({ userId });
 
-    if (filter.contactType) {
-      contactsQuery.where('contactType').equals(filter.contactType);
-    }
-    if (filter.isFavourite !== undefined) {
-      contactsQuery.where('isFavourite').equals(filter.isFavourite);
-    }
-
-    const [contactsCount, contacts] = await Promise.all([
-      ContactsCollection.find({ userId }).merge(contactsQuery).countDocuments(),
-      contactsQuery.skip(skip).limit(limit).sort(sortOptions).lean().exec(),
-    ]);
-
-    const paginationData = calculatePaginationData(
-      contactsCount,
-      perPage,
-      page,
-    );
-
-    return {
-      data: contacts,
-      ...paginationData,
-    };
-  } catch (err) {
-    throw new Error(`Failed to get contacts: ${err.message}`);
+  if (filter.contactType) {
+    contactsQuery.where('contactType').equals(filter.contactType);
   }
+  if (filter.isFavourite) {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  const [contactsCount, contacts] = await Promise.all([
+    ContactsCollection.find({ userId }).merge(contactsQuery).countDocuments(),
+    contactsQuery.skip(skip).limit(limit).sort(sortOptions).exec(),
+  ]);
+
+  const paginationData = calculatePaginationData(contactsCount, perPage, page);
+
+  return {
+    data: contacts,
+    ...paginationData,
+  };
 };
 
 export const getContactById = async (id, userId) => {
-  try {
-    const contact = await ContactsCollection.findOne({
-      _id: id,
-      userId,
-    }).lean();
-    return contact;
-  } catch (err) {
-    throw new Error(`Failed to get contact by id: ${err.message}`);
-  }
+  const contact = await ContactsCollection.findOne({ _id: id, userId });
+  return contact;
 };
 
 export const createContact = async (payload, userId) => {
-  try {
-    const contactPayload = { ...payload, userId };
-    const contact = await ContactsCollection.create(contactPayload);
-    return contact;
-  } catch (err) {
-    throw new Error(`Failed to create contact: ${err.message}`);
-  }
+  const contactPayload = { ...payload, userId };
+  const contact = await ContactsCollection.create(contactPayload);
+  return contact;
 };
 
 export const deleteContact = async (id, userId) => {
-  try {
-    const contact = await ContactsCollection.findOneAndDelete({
-      _id: id,
-      userId,
-    }).lean();
-    return contact;
-  } catch (err) {
-    throw new Error(`Failed to delete contact: ${err.message}`);
-  }
+  const contact = await ContactsCollection.findOneAndDelete({
+    _id: id,
+    userId,
+  });
+
+  return contact;
 };
 
-export const updateContact = async (id, payload, userId) => {
-  try {
-    const rawResult = await ContactsCollection.findOneAndUpdate(
-      { _id: id, userId },
-      payload,
+export const updateContact = async (id, payload, userId, options = {}) => {
+  const rawResult = await ContactsCollection.findOneAndUpdate(
+    { _id: id, userId },
+    payload,
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
 
-    ).lean();
+  if (!rawResult || !rawResult.value) return null;
 
-    if (!rawResult) return null;
-
-    return {
-      contact: rawResult,
-    };
-  } catch (err) {
-    throw new Error(`Failed to update contact: ${err.message}`);
-  }
+  return {
+    contact: rawResult.value,
+    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+  };
 };
