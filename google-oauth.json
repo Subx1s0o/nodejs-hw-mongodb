@@ -1,9 +1,9 @@
 {
   "web": {
-    "project_id": "contacts-app-435017",
+    "project_id": "solid-choir-426609-p1",
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
     "token_uri": "https://oauth2.googleapis.com/token",
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "redirect_uris": ["http://localhost:3000/confirm-google-oauth"]
+    "redirect_uris": ["http://localhost:3000/auth/confirm-oauth", "https://nodejs-hw-mongodb-fgec.onrender.com/auth/confirm-oauth"]
   }
 }
