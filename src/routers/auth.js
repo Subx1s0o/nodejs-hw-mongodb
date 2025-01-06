@@ -42,7 +42,6 @@ router.post(
   validateBody(requestResetEmailSchema),
   ctrlWrapper(requestResetEmailController),
 );
-export default router;
 
 router.post(
   '/reset-pwd',
@@ -57,3 +56,5 @@ router.post(
   validateBody(loginWithGoogleOAuthSchema),
   ctrlWrapper(loginWithGoogleController),
 );
+
+export default router;

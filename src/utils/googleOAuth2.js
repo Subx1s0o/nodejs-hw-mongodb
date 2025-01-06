@@ -13,6 +13,8 @@ const googleOAuthClient = new OAuth2Client({
   clientId: env('GOOGLE_AUTH_CLIENT_ID'),
   clientSecret: env('GOOGLE_AUTH_CLIENT_SECRET'),
   redirectUri: oauthConfig.web.redirect_uris[0],
+  
+
 });
 
 export const generateAuthUrl = () =>
@@ -24,10 +26,10 @@ export const generateAuthUrl = () =>
   });
 
 export const validateCode = async (code) => {
-  console.log(code);
   
+  const encoded = decodeURIComponent(code);
   try {
-    const response = await googleOAuthClient.getToken(code);
+    const response = await googleOAuthClient.getToken(encoded);
     console.log(response);  
     if (!response.tokens.id_token) {
       throw new createHttpError(500,'No id_token in response');
